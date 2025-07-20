@@ -1,0 +1,18 @@
+version: '3'
+services:
+  admin:
+    build: .
+    ports:
+      - '3001:3001'
+    environment:
+      - REACT_APP_GOOGLE_CLIENT_ID=338149376648-75b64mui7mts4754ldh98k48ernv0o1n.apps.googleusercontent.co
+      - REACT_APP_SERVER_API=https://admin.ordersdropship.com/api/v1/
+    # links:
+    #   - server
+  # client:
+  #   image: natsu2001/server-webtodo:latest
+  #   environment:
+  #     - REACT_APP_GOOGLE_CLIENT_ID=338149376648-75b64mui7mts4754ldh98k48ernv0o1n.apps.googleusercontent.co
+  #     - REACT_APP_SERVER_API=https://api.everyorders.com/api/v1/
+  #   ports:
+  #     - "3000:3000"
