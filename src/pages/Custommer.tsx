@@ -246,7 +246,7 @@ const Custommer = () => {
                         <th scope="col" className="px-6 py-3 text-center">Hành động</th>
                         <th scope="col" className="px-6 py-3 text-center">Cài đặt order theo ngày</th>
                         <th scope="col" className="px-6 py-3 text-center min-w-[130px]">Ngân hàng</th>
-                        <th scope="col" className="px-6 py-3 text-center min-w-[130px]">Đóng băng tiền</th>
+                        {/* <th scope="col" className="px-6 py-3 text-center min-w-[130px]">Đóng băng tiền</th> */}
 
                         <th scope="col" className="px-6 py-3 text-center">Nạp tiền</th>
                       </tr>
@@ -470,7 +470,7 @@ const Custommer = () => {
                             </button>
                           </td>
 
-                          <td className="px-6 py-3">
+                          {/* <td className="px-6 py-3">
                             <button
                               type="button"
                               title="Đóng băng tiền"
@@ -482,7 +482,7 @@ const Custommer = () => {
                             >
                               Tác động
                             </button>
-                          </td>
+                          </td> */}
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center items-center gap-3">
                               <button

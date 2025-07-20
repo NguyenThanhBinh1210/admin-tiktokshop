@@ -28,7 +28,14 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
   const [numberOder, setNumberOder] = useState<number>(0)
 
   // Mặc định hôm nay
-  const today = new Date().toISOString().split('T')[0]
+  const getVietnamToday = () => {
+    const now = new Date()
+    // Chuyển về múi giờ Việt Nam (UTC+7)
+    const vietnamTime = new Date(now.getTime() + (7 * 60 * 60 * 1000))
+    return vietnamTime.toISOString().split('T')[0]
+  }
+
+  const today = getVietnamToday()
   const [day, setDay] = useState<string>(today)
   const [numberOderSetting, setNumberOderSetting] = useState<number>(0)
   const [numberOrder, setNumberOrder] = useState<number>(0)

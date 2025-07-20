@@ -100,14 +100,14 @@ const Header = () => {
                   <button>Nhân viên</button>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to='/id-ref'
                   className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
                 >
                   <button>Mã giới thiệu</button>
                 </Link>
-              </li>
+              </li> */}
             </>
           )}
           {/* <li>
@@ -126,14 +126,14 @@ const Header = () => {
               <button>Khách hàng</button>
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to='/add-product'
               className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
             >
               <button>Đăng kí bán hàng</button>
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to='/product'

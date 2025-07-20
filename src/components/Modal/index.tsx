@@ -36,7 +36,7 @@ const Modal = ({ isOpen, onClose, data }: any) => {
   })
   console.log(data)
   useEffect(() => {
-    setName(data?.name ? data?.name : '')
+    setName(data?.nameUserBank ? data?.nameUserBank : '')
     setUsername(data?.username ? data?.username : '')
     setBankName(data?.bankName ? data?.bankName : '')
     setBankNumber(data?.banKNumber ? data?.banKNumber : '')
@@ -148,7 +148,6 @@ const Modal = ({ isOpen, onClose, data }: any) => {
                   id='name'
                   className='bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
                   placeholder=''
-                  disabled
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value)
