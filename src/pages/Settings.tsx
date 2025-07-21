@@ -1,3 +1,4 @@
+
 import { Content } from 'antd/es/layout/layout'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-query'
@@ -41,9 +42,9 @@ import {
 import Dropdown from '../components/Dropdown/Dropdown'
 
 const Settings = () => {
-  const [cowndown, setCoundown] = useState<any>()
-  const [message, setMessage] = useState<any>()
-  const [tiso, setTiso] = useState<any>()
+  const [cowndown, setCoundown] = useState<string>('')
+  const [message, setMessage] = useState<string>('')
+  const [tiso, setTiso] = useState<string>('')
   const [commission, setCommission] = useState<any>()
   const [show, setShow] = useState<boolean>(false)
   const [show1, setShow1] = useState<boolean>(false)
@@ -57,33 +58,57 @@ const Settings = () => {
   const [show8, setShow8] = useState<boolean>(false)
   const [show9, setShow9] = useState<boolean>(false)
 
-  const [client, setClient] = useState<any>()
-  const [gioihan, setGioihan] = useState<any>()
-  const [gioihanthem, setGioihanThem] = useState<any>()
-  const [newcomer, setNewcomer] = useState<any>()
-  const [newcomerCommission, setNewcomerCommissions] = useState<any>()
-  const [percent, setpercent] = useState<any>()
-  const [orderCommission, setOrderCommission] = useState<any>()
-  const [faction, setFaction] = useState<any>()
-  const [point, setPoint] = useState<any>()
-  const [time, setTime] = useState<any>()
+  const [client, setClient] = useState<string>('')
+  const [gioihan, setGioihan] = useState<string>('')
+  const [gioihanthem, setGioihanThem] = useState<string>('')
+  const [newcomer, setNewcomer] = useState<string>('')
+  const [newcomerCommission, setNewcomerCommissions] = useState<string>('')
+  const [percent, setpercent] = useState<string>('')
+  const [orderCommission, setOrderCommission] = useState<string>('')
+  const [faction, setFaction] = useState<string>('')
+  const [point, setPoint] = useState<string>('')
+  const [time, setTime] = useState<string>('')
   const [selectedOption, setSelectedOption] = useState(null)
   const [inputValue, setInputValue] = useState('')
-  const [numberOrder, setNumberOrder] = useState<any>()
-  const [orderPercentage, setOrderPercentage] = useState<any>()
+  const [numberOrder, setNumberOrder] = useState<string>('')
+  const [orderPercentage, setOrderPercentage] = useState<string>('')
+
+  // Interface for InputWithConfirm
+  interface InputWithConfirmProps {
+    label: string
+    value: string | number
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onConfirm: () => void
+    showConfirm: boolean
+    placeholder?: string
+    type?: string
+    suffix?: string
+    className?: string
+  }
+
+  // Interface for TextareaWithConfirm
+  interface TextareaWithConfirmProps {
+    label: string
+    value: string
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+    onConfirm: () => void
+    showConfirm: boolean
+    placeholder?: string
+    rows?: number
+  }
 
   // Component for input field with confirmation button
-  const InputWithConfirm = ({ 
-    label, 
-    value, 
-    onChange, 
-    onConfirm, 
-    showConfirm, 
-    placeholder = "0", 
+  const InputWithConfirm = ({
+    label,
+    value,
+    onChange,
+    onConfirm,
+    showConfirm,
+    placeholder = "0",
     type = "number",
     suffix = "",
     className = ""
-  }) => (
+  }: InputWithConfirmProps) => (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
         {label}
@@ -121,15 +146,15 @@ const Settings = () => {
   )
 
   // Component for textarea with confirmation
-  const TextareaWithConfirm = ({ 
-    label, 
-    value, 
-    onChange, 
-    onConfirm, 
-    showConfirm, 
+  const TextareaWithConfirm = ({
+    label,
+    value,
+    onChange,
+    onConfirm,
+    showConfirm,
     placeholder = "Nhập nội dung...",
     rows = 4
-  }) => (
+  }: TextareaWithConfirmProps) => (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
         {label}
@@ -241,7 +266,9 @@ const Settings = () => {
         toast.success('Cập nhật tỉ lệ người mới thành công ')
         setShow3(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -256,7 +283,9 @@ const Settings = () => {
         toast.success('Cập nhật hoa hồng người mới thành công ')
         setShow7(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -271,7 +300,9 @@ const Settings = () => {
         toast.success('Cập nhật % hoa hồng giới thiệu thành công ')
         setShow5(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -286,7 +317,9 @@ const Settings = () => {
         toast.success('Cập nhật Hoa hồng / đơn hàng (%) thành công ')
         setShow6(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -301,7 +334,9 @@ const Settings = () => {
         toast.success('Cập nhật số lượt order thành công ')
         setShow8(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -316,7 +351,9 @@ const Settings = () => {
         toast.success('Cập nhật phần trăm order thành công ')
         setShow9(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -331,7 +368,9 @@ const Settings = () => {
         toast.success('Cập nhật nội dung thông báo tin nhắn thành công!')
         setShowMess(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: () => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -346,7 +385,9 @@ const Settings = () => {
         toast.success('Cập nhật thời gian thành công ')
         setShow2(false)
       },
-      onError: () => toast.warning('Lỗi, hãy thử lại!')
+      onError: (error: any) => {
+        toast.warning('Lỗi, hãy thử lại!')
+      }
     })
   }
 
@@ -373,7 +414,7 @@ const Settings = () => {
             <InputWithConfirm
               label="Tỉ lệ hoa hồng người mới (%)"
               value={newcomer}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNewcomer(e.target.value)
                 setShow3(true)
               }}
@@ -385,7 +426,7 @@ const Settings = () => {
             <InputWithConfirm
               label="Giới hạn để nhận hoa hồng với người mới"
               value={newcomerCommission}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNewcomerCommissions(e.target.value)
                 setShow7(true)
               }}
@@ -397,7 +438,7 @@ const Settings = () => {
             <InputWithConfirm
               label="Tỉ lệ % hoa hồng giới thiệu / 1 người (%)"
               value={orderCommission}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setOrderCommission(e.target.value)
                 setShow5(true)
               }}
@@ -409,7 +450,7 @@ const Settings = () => {
             <InputWithConfirm
               label="Hoa hồng / đơn hàng (%)"
               value={percent}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setpercent(e.target.value)
                 setShow6(true)
               }}
@@ -430,7 +471,7 @@ const Settings = () => {
             <InputWithConfirm
               label="Số lượng đơn hàng được order trong 1 ngày"
               value={numberOrder}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNumberOrder(e.target.value)
                 setShow8(true)
               }}
@@ -442,7 +483,7 @@ const Settings = () => {
             <InputWithConfirm
               label="Phần trăm số tiền tối thiểu mỗi lần order (%)"
               value={orderPercentage}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setOrderPercentage(e.target.value)
                 setShow9(true)
               }}
@@ -454,7 +495,7 @@ const Settings = () => {
             {/* <InputWithConfirm
               label="Thời gian đếm ngược đơn hàng (phút)"
               value={time}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setTime(e.target.value)
                 setShow2(true)
               }}
@@ -475,7 +516,7 @@ const Settings = () => {
             <TextareaWithConfirm
               label="Nội dung tin nhắn thông báo"
               value={message}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                 setMessage(e.target.value)
                 setShowMess(true)
               }}
