@@ -58,7 +58,7 @@ const Header = () => {
       <div className='py-4 overflow-y-auto flex flex-col justify-between h-[100%]'>
         <ul className='space-y-2'>
           {profile?.isAdmin ||
-            (profile?.isStaff && (
+            (profile?.isAdmin && (
               <li>
                 <Link
                   to='/'
@@ -126,6 +126,14 @@ const Header = () => {
               <button>Khách hàng</button>
             </Link>
           </li>
+          <li>
+            <Link
+              to='/facebook-customer'
+              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
+            >
+              <button>Facebook KH</button>
+            </Link>
+          </li>
           {/* <li>
             <Link
               to='/add-product'
@@ -175,7 +183,7 @@ const Header = () => {
               <button className='text-left'>Lịch sử đặt hàng đặc biệt</button>
             </Link>
           </li>
-          {profile?.isAdmin && <li>
+          {/* {profile?.isAdmin && <li>
             <Link
               to='/message'
               className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
@@ -190,7 +198,7 @@ const Header = () => {
             >
               <button>Tin nhắn</button>
             </Link>
-          </li>}
+          </li>} */}
           <li>
             <Link
               to='/notify'

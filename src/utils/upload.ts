@@ -9,6 +9,8 @@ class Http {
     this.accessToken = getAccessTokenFromLS()
     this.instance = axios.create({
       baseURL: 'https://admin.ordersdropship.com/api',
+            //baseURL: 'https://admin.ordersdropship.com1/api',
+
       // baseURL: 'https://upload.everyorders.com/api',
       // baseURL: 'https://v1.nguyenkims.fun/api',
       timeout: 10000,

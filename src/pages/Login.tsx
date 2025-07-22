@@ -32,7 +32,7 @@ const Login = () => {
           setProfile(newUser)
           toast.success(dataUser.data.message)
           setIsAuthenticated(true)
-          navigate('/')
+          navigate('/custommer')
           setTimeout(() => {
             window.location.reload()
           }, 500)

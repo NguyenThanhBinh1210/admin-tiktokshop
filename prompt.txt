@@ -1,0 +1,103 @@
+Chức năng: Quản lý tài khoản Facebook khách hàng cho nhân viên
+
+Mục tiêu:
+- Cho phép nhân viên lưu trữ tài khoản Facebook của khách hàng vào hệ thống, gắn với id khách hàng và id nhân viên.
+- Đảm bảo không lưu trùng tài khoản Facebook.
+- Cho phép admin xem toàn bộ danh sách, có phân trang và tìm kiếm theo từng trường riêng biệt.
+- Hỗ trợ kiểm tra nhanh tài khoản Facebook đã tồn tại chưa.
+
+---
+
+1. Kiểm tra tài khoản Facebook đã tồn tại chưa
+- Endpoint: GET /admin/employee/facebook-customer/check?facebookAccount=<facebook_account>
+- Tham số query: facebookAccount (có thể là link, username, ...). Backend sẽ tự động chuẩn hóa lấy username cuối cùng.
+- Response:
+{
+  "status": "success",
+  "data": {
+    "existed": true,      // true nếu đã tồn tại, false nếu chưa
+    "info": { ... }       // Thông tin bản ghi nếu có, null nếu chưa
+  }
+}
+
+2. Lưu tài khoản Facebook khách hàng
+- Endpoint: POST /admin/employee/facebook-customer
+- Headers: Authorization: Bearer <token> (token của nhân viên, dùng để xác định staffId)
+- Body (JSON):
+{
+  "facebookAccount": "facebook.com/duyenocho",   // Có thể là link, username, ... (backend sẽ tự chuẩn hóa)
+  "userId": "id_khach_hang"                      // _id của khách hàng (lấy từ bảng user)
+}
+- Không cần truyền staffId – backend sẽ tự lấy từ token đăng nhập.
+- Nếu tài khoản Facebook đã tồn tại, trả về lỗi.
+- Response thành công:
+{
+  "status": "success",
+  "data": {
+    "_id": "...",
+    "facebookAccount": "duyenocho",
+    "staffId": "id_nhan_vien",
+    "userId": "id_khach_hang",
+    "createdAt": "...",
+    "updatedAt": "...",
+    "facebookUrl": "https://www.facebook.com/duyenocho"
+  }
+}
+
+3. Lấy toàn bộ danh sách tài khoản Facebook khách hàng (chỉ cho admin, có phân trang & search)
+- Endpoint: GET /admin/employee/facebook-customer/all
+- Headers: Authorization: Bearer <token> (token của admin)
+- Query params:
+  - page: Số trang (bắt đầu từ 1, mặc định 1)
+  - limit: Số bản ghi/trang (mặc định 10)
+  - facebookAccount: (tùy chọn) Tìm theo username Facebook (partial, không phân biệt hoa thường)
+  - staffUsername: (tùy chọn) Tìm theo username của nhân viên (partial, không phân biệt hoa thường)
+  - userUsername: (tùy chọn) Tìm theo username của khách hàng (partial, không phân biệt hoa thường)
+- Có thể truyền 1, 2 hoặc cả 3 query, backend sẽ kết hợp điều kiện AND.
+- Response:
+{
+  "status": "success",
+  "data": [
+    {
+      "_id": "...",
+      "facebookAccount": "duyenocho",
+      "staffId": { "_id": "...", "name": "Tên nhân viên", "username": "..." },
+      "userId": { "_id": "...", "name": "Tên khách", "username": "..." },
+      "createdAt": "...",
+      "updatedAt": "...",
+      "facebookUrl": "https://www.facebook.com/duyenocho"
+    },
+    ...
+  ],
+  "page": 1,
+  "limit": 10,
+  "total": 123,
+  "totalPages": 13
+}
+
+---
+
+Quy trình chuẩn cho FE:
+1. Nhân viên nhập tài khoản Facebook khách hàng.
+2. FE gọi API check để kiểm tra trùng.
+   - Nếu đã tồn tại: Thông báo cho nhân viên, không cho lưu.
+   - Nếu chưa tồn tại: Hiển thị nút/lựa chọn để lưu.
+3. FE gọi API POST để lưu, chỉ truyền facebookAccount và userId.
+   - userId là _id của khách hàng (lấy từ danh sách user).
+   - Không cần truyền staffId, backend tự lấy từ token.
+4. Admin có thể xem toàn bộ danh sách, phân trang, mỗi bản ghi có cả thông tin nhân viên và khách hàng, có thể tìm kiếm theo từng trường riêng biệt.
+
+---
+
+Lưu ý kỹ thuật:
+- FE cần truyền token hợp lệ (JWT) trong header cho mọi request.
+- userId phải là _id của khách hàng đã có trong hệ thống.
+- staffId backend tự lấy từ token, không cần truyền.
+- Phân trang: FE truyền page, limit khi lấy danh sách cho admin.
+- Không lưu trùng facebookAccount.
+- Khi hiển thị, dùng trường facebookUrl để show link Facebook đầy đủ.
+- Tìm kiếm:
+  - Theo username Facebook: facebookAccount
+  - Theo username nhân viên: staffUsername
+  - Theo username khách hàng: userUsername
+  - Có thể kết hợp nhiều trường, backend sẽ lọc theo tất cả điều kiện. 

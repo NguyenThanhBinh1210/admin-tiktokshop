@@ -136,7 +136,7 @@ const PaymentHistory = () => {
                     <td className="px-6 py-4">{(currentPage - 1) * itemsPerPage + idx + 1}</td>
                     <td className="px-6 py-4">{item.codeOder}</td>
                     <td className="px-6 py-4">{item.userId?.username}</td>
-                    <td className="px-6 py-4">{item.userId?.name}</td>
+                    <td className="px-6 py-4">{item.nameUserBank}</td>
 
                     <td className="px-6 py-4">{FormatNumber(item.totalAmount)}</td>
                     <td className="px-6 py-4">{item.bankName}</td>

@@ -31,6 +31,7 @@ import MessageByEmployee from './pages/MessageByEmployee';
 import Unauthorized from './pages/Unauthorized';
 import OrderSpecial from './pages/OrderSpecial';
 import SetOrderProduct from './pages/SetOrderProduct';
+import FacebookCustomer from './pages/FacebookCustomer';
 
 function ProtectedRoute() {
   const { isAuthenticated } = React.useContext(AppContext);
@@ -213,6 +214,14 @@ const useRouteElements = () => {
               element: (
                 <AdminLayout title="Lịch sử hoạt động">
                   <LuuVet />
+                </AdminLayout>
+              ),
+            },
+            {
+              path: '/facebook-customer',
+              element: (
+                <AdminLayout title="Facebook KH">
+                  <FacebookCustomer />
                 </AdminLayout>
               ),
             },

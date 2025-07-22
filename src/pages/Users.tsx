@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 import { updateRole } from '~/apis/auth.api'
 // eslint-disable-next-line import/namespace
-import { deleteStaff, getAllAdmin, searchUser } from '~/apis/product.api'
+import { deleteStaff, getAllAdmin, searchUser, updateStaff } from '~/apis/product.api'
 import Loading from '~/components/Loading/Loading'
 import CreateStaff from '~/components/Modal/CreateStaff'
 import GetCustomerByStaff from '~/components/Modal/GetCustomerByStaff'
@@ -12,6 +12,7 @@ import NotReSearch from '~/components/NotReSearch/NotReSearch'
 import Paginate from '~/components/Pagination/Paginate'
 import SearchHeader from '~/components/Search/Search'
 import usePagination from '~/hooks/usePagination'
+import Customer from './Custommer'
 
 const Users = () => {
   const initialFromState = {
@@ -33,8 +34,16 @@ const Users = () => {
     mutationFn: ({ id, status, customer }: { id: string; status: string; customer: string }) =>
       deleteStaff(id, status, customer)
   })
-  const updateMutation = useMutation({
-    mutationFn: (item: any) => updateRole(item._id, { isAdmin: item?.isAdmin ? 'false' : 'true' })
+  const updateMutation = useMutation((body: any) => {
+    const updateData = {
+      isLook: body.isLook,
+      isIdRef: body.isIdRef,
+      isDongBang: body.isDongBang,
+      level: body.level,
+      nameUser: body.nameUser,
+      activate: body.activate,
+    }
+    return updateStaff(body?._id, updateData)
   })
   const updateMutation2 = useMutation({
     mutationFn: (item: any) => updateRole(item._id, { isStaff: item?.isStaff ? 'false' : 'true' })
@@ -70,6 +79,45 @@ const Users = () => {
       setCurrentPage(page)
     }
   }
+  const handleUpdateField = (item: Customer, field: 'isLook' | 'isIdRef' | 'isDongBang', activateMessage: string) => {
+    const newData = {
+      _id: item._id,
+      [field]: !item[field],
+      nameUser: item.username,
+      activate: activateMessage,
+    }
+
+    updateMutation.mutate(newData, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['users', 3] })
+        toast.success('Thành công!')
+      },
+    })
+  }
+  const renderToggleSwitch = (
+    item: Customer,
+    field: 'isLook' | 'isIdRef' | 'isDongBang',
+    onText: string,
+    offText: string,
+    activateMessage: string
+  ) => (
+    <div className="flex items-center">
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={item[field]}
+          onChange={() => handleUpdateField(item, field, activateMessage)}
+        />
+        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer transition-colors peer-checked:bg-green-500" />
+        <div className="absolute w-4 h-4 p-3 bg-white border border-gray-300 rounded-full transition-all peer-checked:translate-x-5" />
+      </label>
+      <span className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+        {item[field] ? onText : offText}
+      </span>
+    </div>
+  )
+
   const handleSearch = (e: any) => {
     e.preventDefault()
     searchMutation.mutate(search, {
@@ -133,8 +181,15 @@ const Users = () => {
                           UserName
                         </th>
                         <th scope='col' className='px-6 py-3'>
-                          Cập nhập khách hàng
+                          Mã nhân viên
                         </th>
+                        <th scope='col' className='px-6 py-3'>
+                          Khoá mã mời
+                        </th>
+{/* 
+                        <th scope='col' className='px-6 py-3'>
+                          Cập nhập khách hàng
+                        </th> */}
 
 
                         <th scope='col' className='px-6 py-3'>
@@ -169,6 +224,21 @@ const Users = () => {
                               >
                                 {item.username}
                               </th>
+                              <th
+                                scope='row'
+                                className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
+                              >
+                                {item.idUser}
+                              </th>
+                              <td className="px-3 py-3">
+                                {renderToggleSwitch(
+                                  item,
+                                  'isIdRef',
+                                  'Mở',
+                                  'Khoá',
+                                  `đã ${item.isIdRef ? 'mở' : 'khoá'} mã mời tài khoản ${item.username}`
+                                )}
+                              </td>
                               {/* <th
                                 scope='row'
                                 className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
@@ -184,8 +254,8 @@ const Users = () => {
                                       }`}
                                   />
                                 </button>
-                              </th>
-                              <th
+                              </th> */}
+                              {/* <th
                                 scope='row'
                                 className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                               >
@@ -200,7 +270,7 @@ const Users = () => {
                                       }`}
                                   />
                                 </button>
-                              </th> */}
+                              </th>
                               <th
                                 scope='row'
                                 className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
@@ -214,7 +284,7 @@ const Users = () => {
                                 >
                                   Cập nhật
                                 </button>
-                              </th>
+                              </th> */}
 
 
                               <th
