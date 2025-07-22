@@ -37,6 +37,7 @@ const MinusMoney = ({ isOpen, onClose, userId }: { isOpen: boolean; onClose: () 
         setFormState(initialFromState)
         const socket = io(serverUrl);
         socket.emit('resetMoneyUserByAdmin', userId._id);
+        socket.emit("sendRequest", userId._id);
         toast.success('Thành công!')
         onClose()
       },

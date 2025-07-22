@@ -61,6 +61,7 @@ const AddWalletHistory = ({
         toast.success('Thành công!')
         const socket = io(serverUrl);
         socket.emit('resetMoneyUserByAdmin', userId._id);
+        socket.emit("sendRequest", userId.userId._id);
         onClose()
       },
       onError: (error: any) => {
@@ -81,6 +82,8 @@ const AddWalletHistory = ({
         queryClient.invalidateQueries({ queryKey: ['user', 3] })
         setFormState(initialFromState)
         toast.success('Thành công!')
+        const socket = io(serverUrl);
+        socket.emit("sendRequest", userId.userId._id);
         onClose()
       },
       onError: (error: any) => {

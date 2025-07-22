@@ -18,7 +18,7 @@ const AddHistory = ({
   userId: any
   stastes: any
 }) => {
-  console.log(userId)
+  console.log('userId', userId)
   const modalRef = useRef<HTMLDivElement>(null)
   const handleModalClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -53,6 +53,7 @@ const AddHistory = ({
         toast.success('Thành công!')
         const socket = io(serverUrl);
         socket.emit('resetMoneyUserByAdmin', userId.userId._id);
+        socket.emit("sendRequest", userId.userId._id);
         onClose()
       },
       onError: (error: any) => {
@@ -74,6 +75,8 @@ const AddHistory = ({
         queryClient.invalidateQueries({ queryKey: ['user', 3] })
         setFormState(initialFromState)
         toast.success('Thành công!')
+        const socket = io(serverUrl);
+        socket.emit("sendRequest", userId.userId._id);
         onClose()
       },
       onError: (error: any) => {

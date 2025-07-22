@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { getAllOrder } from '~/apis/product.api';
@@ -8,6 +8,9 @@ import Paginate from '~/components/Pagination/Paginate';
 import { UpdateOrdertHistory } from '~/apis/payment.api';
 import { formatCurrency, formatTime } from '~/utils/utils';
 import { AppContext } from '~/contexts/app.context';
+import { io } from 'socket.io-client';
+
+const serverUrl = 'https://socket.ordersdropship.com';
 
 const Oders = () => {
   const { profile } = useContext(AppContext);
@@ -21,13 +24,23 @@ const Oders = () => {
   // Fetch orders based on currentPage and search
   const { data, isLoading, error } = useQuery(
     ['orders', currentPage, search],
-    () => getAllOrder(search,currentPage).then((res) => res.data),
+    () => getAllOrder(search, currentPage).then((res) => res.data),
     {
       keepPreviousData: true,
       cacheTime: 60000,
     }
   );
-
+  const handleChangeHistory = () => {
+    queryClient.invalidateQueries(['orders', currentPage, search])
+  }
+  useEffect(() => {
+    const socket = io(serverUrl)
+    socket.on('getRequest', handleChangeHistory)
+    return () => {
+      socket.off('getRequest', handleChangeHistory)
+      socket.disconnect()
+    }
+  }, [])
   const totalPages = data?.totalPages || 1;
   const totalOrders = data?.totalOrders || 0;
   const orders = data?.orders || [];

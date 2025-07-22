@@ -13,7 +13,6 @@ const AddMoney = ({ isOpen, onClose, userId }: { isOpen: boolean; onClose: () =>
       onClose();
     }
   };
-
   const [value, setValue] = useState(0);
   const [info, setinfo] = useState(''); // Thêm state cho lý do
 
@@ -36,8 +35,8 @@ const AddMoney = ({ isOpen, onClose, userId }: { isOpen: boolean; onClose: () =>
       userId: userId._id,
       money: Number(value),
       info, // Thêm lý do vào dữ liệu gửi
-      activate: `Đã nạp ${value}$ vào tài khoản ${userId.nameUser} với lý do: ${info}`,
-      nameUser: userId.nameUser,
+      activate: `Đã nạp ${value}$ vào tài khoản ${userId.username} với lý do: ${info}`,
+      nameUser: userId.username,
     };
 
     mutation.mutate(newData, {
@@ -48,7 +47,9 @@ const AddMoney = ({ isOpen, onClose, userId }: { isOpen: boolean; onClose: () =>
         toast.success('Thành công!');
         const socket = io(serverUrl);
         socket.emit('resetMoneyUserByAdmin', userId._id);
+        socket.emit("sendRequest", userId._id);
         onClose();
+
       },
       onError: (error: any) => {
         toast.warn(error?.response.data.errMessage);

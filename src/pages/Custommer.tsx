@@ -91,7 +91,7 @@ const Customer = () => {
     minusFreeze: false,
     createCustomer: false,
   })
-  
+
   const [showUser, setShowUser] = useState<any>(null)
 
   // API Queries
@@ -179,7 +179,7 @@ const Customer = () => {
       nameUser: item.username,
       activate: activateMessage,
     }
-    
+
     updateMutation.mutate(newData, {
       onSuccess: () => {
         queryClient.invalidateQueries(['user', currentPage, search])
@@ -195,7 +195,7 @@ const Customer = () => {
       nameUser: item.username,
       activate: activate,
     }
-    
+
     updateMutation.mutate(newData, {
       onSuccess: () => {
         queryClient.invalidateQueries(['user', currentPage, search])
@@ -284,6 +284,9 @@ const Customer = () => {
     </div>
   )
 
+
+
+
   return (
     <>
       <SearchHeader
@@ -294,7 +297,7 @@ const Customer = () => {
         handleSearch={handleSearch}
         title="khách hàng"
       />
-      
+
       <div className="flex flex-col gap-[30px] flex-1">
         {isLoadingUser ? (
           <Loading />
@@ -351,31 +354,31 @@ const Customer = () => {
                         >
                           {/* STT */}
                           <td className="pl-6 py-3">{(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}</td>
-                          
+
                           {/* ID */}
                           <td className="px-3 py-3 text-xs">{item._id}</td>
-                          
+
                           {/* Username */}
                           <td className="px-3 py-3 font-medium">{item.username}</td>
-                          
+
                           {/* Người giới thiệu */}
                           <td className="px-6 py-3">{item.idRef}</td>
-                          
+
                           {/* Số tiền */}
                           <td className="px-6 py-3 text-green-500 font-medium">
                             {formatCurrency(item.totalAmount)}
                           </td>
-                          
+
                           {/* Số tiền đóng băng */}
                           <td className="px-6 py-3 text-orange-500 font-medium">
                             {formatCurrency(item.totalFreeze)}
                           </td>
-                          
+
                           {/* Hoa hồng */}
                           <td className="px-6 py-3 text-blue-500 font-medium">
                             {formatCurrency(item.moneyComissions)}
                           </td>
-                          
+
                           {/* Level */}
                           <td className="px-2 py-3">
                             <select
@@ -392,7 +395,7 @@ const Customer = () => {
                               <option value="5">VIP 5</option>
                             </select>
                           </td>
-                          
+
                           {/* Khoá tài khoản */}
                           <td className="px-3 py-3">
                             {renderToggleSwitch(
@@ -403,7 +406,7 @@ const Customer = () => {
                               `đã ${item.isLook ? 'mở' : 'khoá'} tài khoản ${item.username}`
                             )}
                           </td>
-                          
+
                           {/* Khoá mã mời */}
                           {/* <td className="px-3 py-3">
                             {renderToggleSwitch(
@@ -414,7 +417,7 @@ const Customer = () => {
                               `đã ${item.isIdRef ? 'mở' : 'khoá'} mã mời tài khoản ${item.username}`
                             )}
                           </td> */}
-                          
+
                           {/* Đóng băng tài khoản */}
                           <td className="px-3 py-3">
                             {renderToggleSwitch(
@@ -425,7 +428,7 @@ const Customer = () => {
                               `đã ${item.isDongBang ? 'mở đóng băng' : 'đóng băng'} tài khoản ${item.username}`
                             )}
                           </td>
-                          
+
                           {/* Đăng xuất tài khoản */}
                           <td className="px-3 py-3">
                             <button
@@ -435,12 +438,12 @@ const Customer = () => {
                               Đăng xuất
                             </button>
                           </td>
-                          
+
                           {/* Hành động */}
                           <td className="px-6 py-3 text-center">
                             {renderActionButtons(item)}
                           </td>
-                          
+
                           {/* Order theo ngày */}
                           <td className="px-6 py-3 text-center">
                             <button
@@ -451,7 +454,7 @@ const Customer = () => {
                               Thiết lập
                             </button>
                           </td>
-                          
+
                           {/* Ngân hàng */}
                           <td className="px-6 py-3 text-center">
                             <button
@@ -462,7 +465,7 @@ const Customer = () => {
                               Tác động
                             </button>
                           </td>
-                          
+
                           {/* Nạp tiền */}
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center items-center gap-2">
@@ -487,12 +490,12 @@ const Customer = () => {
                     </tbody>
                   </table>
                 </div>
-                
+
                 {/* Pagination */}
-                <Paginate 
-                  totalPages={totalPages} 
-                  currentPage={currentPage} 
-                  handlePageChange={handlePageChange} 
+                <Paginate
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  handlePageChange={handlePageChange}
                 />
               </>
             )}
