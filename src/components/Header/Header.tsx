@@ -7,7 +7,7 @@ import { clearLS } from '~/utils/auth'
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false)
-  const { profile, reset } = useContext(AppContext)
+  const { profile, reset, navbarCollapsed, setNavbarCollapsed } = useContext(AppContext)
   const navigate = useNavigate()
   const handleLogout = () => {
     clearLS()
@@ -17,6 +17,17 @@ const Header = () => {
   }
   const [isDarkMode, toggleDarkMode] = useDarkMode()
   const modalRef = useRef<HTMLDivElement>(null)
+
+  // Toggle navbar cho desktop
+  const toggleNavbar = () => {
+    setNavbarCollapsed(!navbarCollapsed)
+  }
+
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setShowMenu(!showMenu)
+  }
+
   useEffect(() => {
     document.addEventListener('click', (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -24,258 +35,308 @@ const Header = () => {
       }
     })
   }, [])
-  return (
-    <div
-      ref={modalRef}
-      id='drawer-navigation'
-      className={`${showMenu ? 'mobile:translate-x-[0] ' : 'mobile:translate-x-[-100%] '
-        } dark:bg-gray-700 mobile:fixed non-scroll dark:border-none border-r border-gray-300 top-0 sticky left-0 z-40 h-screen p-4  transition-all  bg-white w-60 mobile:w-[240px]`}
-      tabIndex={-1}
-      aria-labelledby='drawer-navigation-label'
-    >
-      <div
-        id='drawer-navigation-label'
-        style={{ textAlign: 'center' }}
-        className={` ${showMenu ? 'hidden' : ''
-          } text-blue-400 flex justify-between items-center text-base font-semibold uppercase dark:text-gray-400 `}
-      >
-        {profile?.isAdmin && profile?.isStaff ? (
-          <h2 style={{ margin: 'auto' }}>
-            <Link to='/'>SuperAdmin</Link>{' '}
-          </h2>
-        ) : (
-          <></>
-        )}
-        {profile?.isAdmin && !profile?.isStaff ? (
-          <h2 style={{ margin: 'auto' }}>
-            <Link to='/'>Admin</Link>{' '}
-          </h2>
-        ) : (
-          <></>
-        )}
-        {profile?.isStaff && !profile?.isAdmin ? <h2 style={{ margin: 'auto' }}>Nhân viên</h2> : <></>}
-      </div>
-      <div className='py-4 overflow-y-auto flex flex-col justify-between h-[100%]'>
-        <ul className='space-y-2'>
-          {profile?.isAdmin ||
-            (profile?.isAdmin && (
-              <li>
-                <Link
-                  to='/'
-                  className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-                >
-                  <button>Dashboard</button>
-                </Link>
-              </li>
-            ))}
-          {profile?.isAdmin && profile?.isStaff ? (
-            <>
-              <li>
-                <Link
-                  to='/luu-vet'
-                  className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-                >
-                  <button>Lịch sử hoạt động</button>
-                </Link>
-              </li>
-            </>
-          ) : (
-            <></>
-          )}
-          {profile?.isAdmin && (
-            <>
-              <li>
-                <Link
-                  to='/'
-                  className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-                >
-                  <button>Dashboard</button>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to='/user'
-                  className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-                >
-                  <button>Nhân viên</button>
-                </Link>
-              </li>
-              {/* <li>
-                <Link
-                  to='/id-ref'
-                  className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-                >
-                  <button>Mã giới thiệu</button>
-                </Link>
-              </li> */}
-            </>
-          )}
-          {/* <li>
-            <Link
-              to='/ip'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Ip</button>
-            </Link>
-          </li> */}
-          <li>
-            <Link
-              to='/custommer'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Khách hàng</button>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to='/facebook-customer'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Facebook KH</button>
-            </Link>
-          </li>
-          {/* <li>
-            <Link
-              to='/add-product'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Đăng kí bán hàng</button>
-            </Link>
-          </li> */}
-          <li>
-            <Link
-              to='/product'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Sản Phẩm</button>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to='/set-order-product'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Lịch sử thêm đơn</button>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to='/payment-history'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Lịch sử Nạp / Rút</button>
-            </Link>
-          </li>
 
-          <li>
-            <Link
-              to='/order'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Lịch sử đặt hàng</button>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to='/order-special'
-              className='flex items-center w-full p-2 text-base  text-left font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button className='text-left'>Lịch sử đặt hàng đặc biệt</button>
-            </Link>
-          </li>
-          {/* {profile?.isAdmin && <li>
-            <Link
-              to='/message'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Tin nhắn</button>
-            </Link>
-          </li>}
-          {profile?.isStaff && !profile?.isAdmin && <li>
-            <Link
-              to='/message-customer'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Tin nhắn</button>
-            </Link>
-          </li>} */}
-          <li>
-            <Link
-              to='/notify'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Thông báo</button>
-            </Link>
-          </li>
-          {profile?.isAdmin && (
-            <li>
-              <Link
-                to='/settings'
-                className='flex gap-x-3 pl-4 items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-              >
-                <div>Cấu hình</div>
-              </Link>
-            </li>
-          )}
-        </ul>
-        <ul className='mt-auto'>
-          <li className=''>
-            <button onClick={toggleDarkMode} className='w-full'>
-              {isDarkMode ? (
-                <div className='flex gap-x-3 items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'>
-                  <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                    <path
-                      d='M12 18.5455C10.264 18.5455 8.59918 17.8558 7.37166 16.6283C6.14415 15.4008 5.45455 13.736 5.45455 12C5.45455 10.264 6.14415 8.59918 7.37166 7.37166C8.59918 6.14415 10.264 5.45455 12 5.45455C13.736 5.45455 15.4008 6.14415 16.6283 7.37166C17.8558 8.59918 18.5455 10.264 18.5455 12C18.5455 13.736 17.8558 15.4008 16.6283 16.6283C15.4008 17.8558 13.736 18.5455 12 18.5455ZM12 16.3636C13.1573 16.3636 14.2672 15.9039 15.0856 15.0856C15.9039 14.2672 16.3636 13.1573 16.3636 12C16.3636 10.8427 15.9039 9.73278 15.0856 8.91444C14.2672 8.0961 13.1573 7.63636 12 7.63636C10.8427 7.63636 9.73278 8.0961 8.91444 8.91444C8.0961 9.73278 7.63636 10.8427 7.63636 12C7.63636 13.1573 8.0961 14.2672 8.91444 15.0856C9.73278 15.9039 10.8427 16.3636 12 16.3636ZM10.9091 1.09091C10.9091 0.488417 11.3975 0 12 0V0C12.6025 0 13.0909 0.488417 13.0909 1.09091V2.18182C13.0909 2.78431 12.6025 3.27273 12 3.27273V3.27273C11.3975 3.27273 10.9091 2.78431 10.9091 2.18182V1.09091ZM10.9091 21.8182C10.9091 21.2157 11.3975 20.7273 12 20.7273V20.7273C12.6025 20.7273 13.0909 21.2157 13.0909 21.8182V22.9091C13.0909 23.5116 12.6025 24 12 24V24C11.3975 24 10.9091 23.5116 10.9091 22.9091V21.8182ZM3.51491 5.05745C3.08895 4.63149 3.08895 3.94087 3.51491 3.51491V3.51491C3.94087 3.08895 4.63149 3.08895 5.05745 3.51491L5.82873 4.28618C6.25469 4.71214 6.25469 5.40277 5.82873 5.82873V5.82873C5.40277 6.25469 4.71214 6.25469 4.28618 5.82873L3.51491 5.05745ZM18.1713 19.7138C17.7453 19.2879 17.7453 18.5972 18.1713 18.1713V18.1713C18.5972 17.7453 19.2879 17.7453 19.7138 18.1713L20.4851 18.9425C20.9111 19.3685 20.9111 20.0591 20.4851 20.4851V20.4851C20.0591 20.9111 19.3685 20.9111 18.9425 20.4851L18.1713 19.7138ZM18.9421 3.51464C19.3682 3.0883 20.0594 3.08834 20.4855 3.51473V3.51473C20.9113 3.94083 20.9111 4.63141 20.4852 5.05736L19.7139 5.82864C19.2879 6.25465 18.5972 6.25465 18.1712 5.82864V5.82864C17.7452 5.4027 17.7452 4.71213 18.171 4.28609L18.9421 3.51464ZM4.28618 18.1713C4.71214 17.7453 5.40277 17.7453 5.82873 18.1713V18.1713C6.25469 18.5972 6.25469 19.2879 5.82873 19.7138L5.05746 20.4851C4.63149 20.9111 3.94087 20.9111 3.51491 20.4851V20.4851C3.08895 20.0591 3.08895 19.3685 3.51491 18.9425L4.28618 18.1713ZM22.9091 10.9091C23.5116 10.9091 24 11.3975 24 12V12C24 12.6025 23.5116 13.0909 22.9091 13.0909H21.8182C21.2157 13.0909 20.7273 12.6025 20.7273 12V12C20.7273 11.3975 21.2157 10.9091 21.8182 10.9091H22.9091ZM2.18182 10.9091C2.78431 10.9091 3.27273 11.3975 3.27273 12V12C3.27273 12.6025 2.78431 13.0909 2.18182 13.0909H1.09091C0.488417 13.0909 0 12.6025 0 12V12C0 11.3975 0.488417 10.9091 1.09091 10.9091H2.18182Z'
-                      fill='#A2A2A8'
-                    />
-                  </svg>
-                  <div>Tối</div>
-                </div>
-              ) : (
-                <div className='flex gap-x-3 items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'>
-                  <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                    <path
-                      d='M9.6 6C9.59976 7.66877 10.0966 9.29979 11.0271 10.6851C11.9576 12.0703 13.2796 13.147 14.8245 13.7779C16.3695 14.4087 18.0673 14.5651 19.7015 14.2271C21.1161 13.9345 22.4275 13.3728 23.512 12.4539C23.698 12.2963 24 12.4229 24 12.6667C24 19.2943 18.6276 24 12 24C5.3724 24 0 18.6276 0 12C0 5.3724 4.70573 0 11.3333 0C11.6208 0 11.7699 0.35622 11.5841 0.575553C11.0336 1.22558 10.5844 1.95701 10.2534 2.74522C9.82058 3.77568 9.59843 4.88234 9.6 6ZM2.4 12C2.39913 14.142 3.11463 16.2227 4.43267 17.9112C5.75071 19.5996 7.59556 20.7987 9.67369 21.3178C11.7518 21.8368 13.9439 21.646 15.901 20.7756C17.8582 19.9052 19.468 18.4052 20.4744 16.5144C18.6833 16.9364 16.8141 16.8937 15.0442 16.3905C13.2742 15.8872 11.6622 14.9401 10.3611 13.6389C9.0599 12.3378 8.11278 10.7258 7.60954 8.95581C7.1063 7.18586 7.06364 5.31667 7.4856 3.5256C5.94909 4.34416 4.66414 5.5652 3.76831 7.05797C2.87247 8.55075 2.39949 10.2591 2.4 12Z'
-                      fill='#A2A2A8'
-                    />
-                  </svg>
-                  <div>Sáng</div>
-                </div>
-              )}
-            </button>
-          </li>
-          <li>
-            <Link
-              to=''
-              onClick={() => handleLogout()}
-              className='flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-            >
-              <svg
-                aria-hidden='true'
-                className='flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
-                fill='currentColor'
-                viewBox='0 0 20 20'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  fillRule='evenodd'
-                  d='M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z'
-                  clipRule='evenodd'
-                />
-              </svg>
-              <span className='flex-1 ml-3 whitespace-nowrap'>Đăng xuất</span>
-            </Link>
-          </li>
-        </ul>
+  // Component cho menu item với tooltip
+  const NavMenuItem = ({ to, icon, label, onClick }: { to?: string, icon: React.ReactNode, label: string, onClick?: () => void }) => {
+    const content = (
+      <div className={`flex items-center w-full text-base font-normal text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 relative ${
+        navbarCollapsed ? 'justify-center py-3 px-2' : 'pl-4 pr-2 py-2'
+      }`}>
+        <div className={`flex-shrink-0 flex items-center justify-center ${navbarCollapsed ? 'nav-icon-collapsed' : 'nav-icon'}`}>
+          {icon}
+        </div>
+        <span className={`ml-3 ${navbarCollapsed ? 'tablet:hidden desktop:hidden' : ''} whitespace-nowrap`}>{label}</span>
+        
+        {/* Tooltip cho collapsed mode */}
+        {navbarCollapsed && (
+          <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 bg-gray-900 text-white text-sm rounded py-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap tablet:block desktop:block hidden shadow-lg">
+            {label}
+            <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900"></div>
+          </div>
+        )}
       </div>
-      <button
-        type='button'
-        onClick={() => setShowMenu(!showMenu)}
-        className='absolute mobile:block hidden right-[-100px] bottom-[20px] text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700'
+    )
+
+    if (onClick) {
+      return <button onClick={onClick} className="w-full text-left" title={label}>{content}</button>
+    }
+
+    return (
+      <Link to={to || '/'} className="block" title={label}>
+        {content}
+      </Link>
+    )
+  }
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      {showMenu && (
+        <div
+          className="mobile:fixed mobile:inset-0 mobile:bg-gray-600 mobile:bg-opacity-50 mobile:z-30 mobile:block hidden mobile-overlay"
+          onClick={toggleMobileMenu}
+          aria-hidden="true"
+        />
+      )}
+      
+      <div
+        ref={modalRef}
+        id='drawer-navigation'
+        className={`${
+          // Mobile behavior
+          showMenu ? 'mobile:translate-x-[0] ' : 'mobile:translate-x-[-100%] '
+        } ${
+          // Desktop behavior
+          navbarCollapsed ? 'tablet:w-20 w-20' : 'tablet:w-60 w-60'
+        } dark:bg-gray-700 mobile:fixed non-scroll dark:border-none border-r border-gray-300 top-0 sticky left-0 z-40 h-screen p-4 navbar-transition bg-white mobile:w-[240px]`}
+        tabIndex={-1}
+        aria-labelledby='drawer-navigation-label'
       >
-        {!showMenu ? 'Menu' : 'Đóng'}
-      </button>
-    </div>
+        {/* Header with toggle button for desktop */}
+        <div className="flex items-center justify-between mb-4">
+          <div
+            id='drawer-navigation-label'
+            className={`${navbarCollapsed ? 'tablet:hidden desktop:hidden' : ''} ${showMenu ? 'hidden' : ''} text-blue-400 flex justify-center items-center text-base font-semibold uppercase dark:text-gray-400 flex-1`}
+          >
+            {profile?.isAdmin && profile?.isStaff ? (
+              <h2>
+                <Link to='/'>SuperAdmin</Link>
+              </h2>
+            ) : (
+              <></>
+            )}
+            {profile?.isAdmin && !profile?.isStaff ? (
+              <h2>
+                <Link to='/'>Admin</Link>
+              </h2>
+            ) : (
+              <></>
+            )}
+            {profile?.isStaff && !profile?.isAdmin ? <h2>Nhân viên</h2> : <></>}
+          </div>
+          
+          {/* Desktop toggle button */}
+          <button
+            type='button'
+            onClick={toggleNavbar}
+            className={`mobile:hidden tablet:flex desktop:flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-600 transition-all duration-200 ${
+              navbarCollapsed ? 'w-10 h-10' : 'w-8 h-8'
+            }`}
+            aria-label="Toggle navigation"
+          >
+            <svg className={`${navbarCollapsed ? 'w-6 h-6' : 'w-5 h-5'}`} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+
+        <div className='py-4 overflow-y-auto h-full sidebar-scroll'>
+          <ul className='space-y-2'>
+            {(profile?.isAdmin || profile?.isAdmin) && (
+              <li>
+                <NavMenuItem
+                  to="/"
+                  icon={
+                    <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                      <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                    </svg>
+                  }
+                  label="Dashboard"
+                />
+              </li>
+            )}
+
+            {profile?.isAdmin && profile?.isStaff && (
+              <li>
+                <NavMenuItem
+                  to="/luu-vet"
+                  icon={
+                    <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path>
+                    </svg>
+                  }
+                  label="Lịch sử hoạt động"
+                />
+              </li>
+            )}
+            
+            <li>
+              <NavMenuItem
+                to="/user"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+                  </svg>
+                }
+                label="Nhân viên"
+              />
+            </li>
+            
+            <li>
+              <NavMenuItem
+                to="/custommer"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
+                  </svg>
+                }
+                label="Khách hàng"
+              />
+            </li>
+            
+            <li>
+              <NavMenuItem
+                to="/facebook-customer"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                  </svg>
+                }
+                label="Facebook KH"
+              />
+            </li>
+            
+            <li>
+              <NavMenuItem
+                to="/product"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
+                  </svg>
+                }
+                label="Sản Phẩm"
+              />
+            </li>
+
+            <li>
+              <NavMenuItem
+                to="/set-order-product"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                  </svg>
+                }
+                label="Lịch sử thêm đơn"
+              />
+            </li>
+
+            <li>
+              <NavMenuItem
+                to="/payment-history"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4z"></path>
+                    <path d="M6 8a2 2 0 012-2h6a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2V8zm2 0v4h6V8H8z"></path>
+                  </svg>
+                }
+                label="Lịch sử Nạp / Rút"
+              />
+            </li>
+
+            <li>
+              <NavMenuItem
+                to="/order"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd"></path>
+                  </svg>
+                }
+                label="Lịch sử đặt hàng"
+              />
+            </li>
+
+            <li>
+              <NavMenuItem
+                to="/order-special"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd"></path>
+                  </svg>
+                }
+                label="Lịch sử đặt hàng đặc biệt"
+              />
+            </li>
+            
+            <li>
+              <NavMenuItem
+                to="/notify"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+                  </svg>
+                }
+                label="Thông báo"
+              />
+            </li>
+            
+            <li>
+              <NavMenuItem
+                to="/settings"
+                icon={
+                  <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"></path>
+                  </svg>
+                }
+                label="Cấu hình"
+              />
+            </li>
+          </ul>
+          
+          <ul className='mt-auto space-y-2'>
+            <li>
+              <NavMenuItem
+                icon={
+                  isDarkMode ? (
+                    <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-full h-full text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                  )
+                }
+                label={isDarkMode ? 'Chế độ sáng' : 'Chế độ tối'}
+                onClick={toggleDarkMode}
+              />
+            </li>
+            <li>
+              <NavMenuItem
+                icon={
+                  <svg
+                    className='w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                    fill='currentColor'
+                    viewBox='0 0 20 20'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z'
+                      clipRule='evenodd'
+                    />
+                  </svg>
+                }
+                label="Đăng xuất"
+                onClick={handleLogout}
+              />
+            </li>
+          </ul>
+        </div>
+        
+        {/* Mobile toggle button */}
+        <button
+          type='button'
+          onClick={toggleMobileMenu}
+          className='absolute mobile:block hidden right-[-50px] top-4 text-white bg-blue-600 border border-blue-600 focus:outline-none hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:border-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+          aria-label="Toggle mobile menu"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </>
   )
 }
 

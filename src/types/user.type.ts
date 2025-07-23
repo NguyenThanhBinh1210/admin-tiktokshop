@@ -3,6 +3,7 @@ export interface User {
   email?: string
   password?: string
   isAdmin?: boolean
+  isStaff?: boolean
   phone?: number
   avatar?: string
   address?: string

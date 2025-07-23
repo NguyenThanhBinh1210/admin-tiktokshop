@@ -24,7 +24,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
   const queryClient = useQueryClient()
 
   const [totalAmount, setTotalAmount] = useState<number>(0)
-  const [commission, setCommission] = useState<number>(0)
+  const [wantage, setwantage] = useState<number>(0)
   const [numberOder, setNumberOder] = useState<number>(0)
 
   // Mặc định hôm nay
@@ -41,7 +41,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
   const [numberOrder, setNumberOrder] = useState<number>(0)
   console.log("numberOderSetting", numberOderSetting);
   const [orderList, setOrderList] = useState<
-    Array<{ productId: string; refillOrder: string; quantity: number; price?: number; ratio?: number }>
+    Array<{ productId: string; refillOrder: string; quantity: number; wantage?: number; ratio?: number }>
   >([])
   const numberOrderDay = !numberOderSetting && numberOder > numberOrder ? numberOrder : numberOderSetting && numberOder > numberOderSetting ? numberOderSetting : numberOder
   const mutationUpdateBank = useMutation((body: any) => {
@@ -57,7 +57,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
       enabled: !!data?._id,
       onSuccess: (orderDayData) => {
         console.log("orderDayData.data.numberOder", orderDayData.data);
-        setCommission(orderDayData?.data.orderDay.commission || 0)
+        setwantage(orderDayData?.data.orderDay.wantage || 0)
         setNumberOder(orderDayData?.data.orderDay.numberOder || 0)
         setNumberOderSetting(orderDayData?.data.orderDay.numberOderSetting || 0)
 
@@ -68,7 +68,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
               refillOrder: item.refillOrder ?? '',
               quantity: item.quantity ?? 1,
 
-              price: item.price ?? 0,
+              wantage: item.wantage ?? 0,
               ratio: item.ratio ?? 0
             }))
           )
@@ -112,15 +112,13 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
 
   const handleChangeOrderRow = (
     index: number,
-    field: 'productId' | 'refillOrder' | 'quantity' | 'price' | 'ratio',
+    field: 'productId' | 'refillOrder' | 'wantage' | 'ratio',
     value: string | number
   ) => {
     setOrderList((prev) => {
       const newArr = [...prev]
-      if (field === 'quantity') {
-        newArr[index].quantity = Number(value)
-      } else if (field === 'price') {
-        newArr[index].price = Number(value)
+     if (field === 'wantage') {
+        newArr[index].wantage = Number(value)
       } else if (field === 'ratio') {
         newArr[index].ratio = Number(value)
       } else {
@@ -288,7 +286,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm 
                     rounded-lg block w-full p-2.5 dark:bg-gray-600 
                     dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  value={formatCurrency(commission)}
+                  value={formatCurrency(wantage)}
                 />
               </div>
             </div>
@@ -344,7 +342,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
               {/* Desktop/Tablet View - Hidden on small screens */}
               <div className='hidden md:block'>
                 <div className='grid grid-cols-6 gap-2 mb-2 text-xs font-medium text-gray-700 dark:text-gray-300'>
-                  <div>Mã đơn</div>
+                  {/* <div>Mã đơn</div> */}
                   <div>Đơn thứ</div>
                   <div>Số lượng</div>
                   <div>Số tiền</div>
@@ -354,7 +352,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
 
                 {orderList.map((orderItem, index) => (
                   <div key={index} className='grid grid-cols-6 gap-2 mb-3'>
-                    <input
+                    {/* <input
                       type='text'
                       className='bg-gray-50 border border-gray-300 
                         text-gray-900 text-sm rounded-lg block w-full p-2
@@ -365,7 +363,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                       onChange={(e) =>
                         handleChangeOrderRow(index, 'productId', e.target.value)
                       }
-                    />
+                    /> */}
                     <input
                       type='number'
                       className='bg-gray-50 border border-gray-300 
@@ -378,7 +376,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                         handleChangeOrderRow(index, 'refillOrder', e.target.value)
                       }
                     />
-                    <input
+                    {/* <input
                       type='number'
                       className='bg-gray-50 border border-gray-300 
                         text-gray-900 text-sm rounded-lg block w-full p-2
@@ -389,7 +387,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                       onChange={(e) =>
                         handleChangeOrderRow(index, 'quantity', +e.target.value)
                       }
-                    />
+                    /> */}
                     <input
                       type='number'
                       className='bg-gray-50 border border-gray-300 
@@ -397,9 +395,9 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                         dark:bg-gray-600 dark:border-gray-500 
                         dark:placeholder-gray-400 dark:text-white'
                       placeholder='Số tiền'
-                      value={orderItem.price}
+                      value={orderItem.wantage}
                       onChange={(e) =>
-                        handleChangeOrderRow(index, 'price', +e.target.value)
+                        handleChangeOrderRow(index, 'wantage', +e.target.value)
                       }
                     />
                     <input
@@ -449,7 +447,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                     </div>
 
                     <div className='grid grid-cols-2 gap-3'>
-                      <div>
+                      {/* <div>
                         <label className='block text-xs text-gray-700 dark:text-gray-400 mb-1'>
                           Mã đơn
                         </label>
@@ -465,7 +463,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                             handleChangeOrderRow(index, 'productId', e.target.value)
                           }
                         />
-                      </div>
+                      </div> */}
 
                       <div>
                         <label className='block text-xs text-gray-700 dark:text-gray-400 mb-1'>
@@ -485,7 +483,7 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                         />
                       </div>
 
-                      <div>
+                      {/* <div>
                         <label className='block text-xs text-gray-700 dark:text-gray-400 mb-1'>
                           Số lượng
                         </label>
@@ -501,11 +499,11 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                             handleChangeOrderRow(index, 'quantity', +e.target.value)
                           }
                         />
-                      </div>
+                      </div> */}
 
                       <div>
                         <label className='block text-xs text-gray-700 dark:text-gray-400 mb-1'>
-                          Số tiền
+                          Số tiền thiếu
                         </label>
                         <input
                           type='number'
@@ -514,8 +512,8 @@ const ViewOrderDay = ({ isOpen, onClose, data }: Props) => {
                             dark:bg-gray-600 dark:border-gray-500 
                             dark:placeholder-gray-400 dark:text-white'
                           placeholder='Nhập số tiền'
-                          value={orderItem.price}
-                          onChange={(e) => handleChangeOrderRow(index, 'price', +e.target.value)}
+                          value={orderItem.wantage}
+                          onChange={(e) => handleChangeOrderRow(index, 'wantage', +e.target.value)}
                         />
                       </div>
 

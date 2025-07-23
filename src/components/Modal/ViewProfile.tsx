@@ -1,291 +1,145 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from 'react'
-import { useMutation, useQueryClient } from 'react-query'
-import { toast } from 'react-toastify'
-import { updateChanDung, updateSau, updateTruoc, updateUser } from '~/apis/admin.api'
-import { updateStaff } from '~/apis/product.api'
-import { objectToFormData } from '~/utils/utils'
+import React, { useRef } from 'react'
+import { formatCurrency } from '~/utils/utils'
+
 const ViewProfile = ({ isOpen, onClose, data }: any) => {
   const modalRef = useRef<HTMLDivElement>(null)
-  const [showChangePass, setShowChangePass] = useState(false)
-  const handleModalClick = (e: React.MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose()
-      setFormState({})
-    }
-  }
-  const queryClient = useQueryClient()
 
-  const mutationUpdateBank = useMutation((body: any) => {
-    return updateUser(data._id, body)
-  })
-  const mutationUpdateTruoc = useMutation((body: any) => {
-    return updateTruoc(data._id, body)
-  })
-  const mutationUpdateSau = useMutation((body: any) => {
-    return updateSau(data._id, body)
-  })
-  const mutationUpdateChanDung = useMutation((body: any) => {
-    return updateChanDung(data._id, body)
-  })
-  const [formState, setFormState] = useState<any>({})
-  const [username, setUserName] = useState<any>()
-  const [ip, setIp] = useState<any>()
-  const [checkIp, setCheckIp] = useState<boolean>(false)
-  const [name, setName] = useState<any>()
-  const [phone, setPhone] = useState<any>()
+  if (!isOpen) return null
 
-  useEffect(() => {
-    setUserName(data?.username ? data?.username : '')
-    setIp(data?.ip ? data?.ip : '')
-    setCheckIp(data?.setIp ? data?.setIp : false)
-    setName(data?.name ? data?.name : '')
-    setPhone(data?.phone ? data?.phone : '')
-
-    setFormState(data)
-  }, [data])
-  console.log(formState)
-  const handleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState((prev: any) => ({ ...prev, [name]: event.target.value }))
-  }
-
-  const handleUpdateBank = (e: any) => {
-    e.preventDefault()
-    if (checkIp === true && ip === '') {
-      toast.warn('Cập nhập ip trước khi xét chặn')
-    } else {
-      const form = {
-        ip: ip,
-        setIp: checkIp,
-        name: name,
-        phone: phone,
-        nameUser: data.username,
-        activate: `đã update thông tin ${checkIp === true ? 'ip' : ''} ${data.username}`
-      }
-      mutationUpdateBank.mutate(form, {
-        onSuccess: () => {
-          toast.success('Thay đổi thông tin thành công!')
-          queryClient.invalidateQueries({ queryKey: ['user', 3] })
-          onClose()
-        }
-      })
-    }
-  }
-
-  const mutationUpdatePassword = useMutation((body: any) => {
-    const newData = {
-      password: body.password,
-      nameUser: data.username,
-      activate: `đã đổi mật khẩu  ${data.username}`
-    }
-    return updateStaff(data._id, newData)
-  })
-  const handleUpdatePassword = () => {
-    mutationUpdatePassword.mutate(formState, {
-      onSuccess: () => {
-        toast.success('Đổi mật khẩu thành công!')
-        setShowChangePass(false)
-      }
-    })
-  }
   return (
-    <div
-      id='authentication-modal'
-      tabIndex={-1}
-      aria-hidden='true'
-      onClick={handleModalClick}
-      className={` ${
-        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-      } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
-    >
-      <div
-        ref={modalRef}
-        className='relative z-100 w-full left-[50%] top-[50%] translate-y-[-50%] translate-x-[-50%] max-w-md max-h-full'
-      >
-        <div className='relative bg-white rounded-lg shadow dark:bg-gray-700'>
-          <button
-            onClick={onClose}
-            type='button'
-            className='absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white'
-            data-modal-hide='authentication-modal'
-          >
-            <svg
-              className='w-3 h-3'
-              aria-hidden='true'
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 14 14'
-            >
-              <path
-                stroke='currentColor'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6'
-              />
-            </svg>
-            <span className='sr-only'>Close modal</span>
-          </button>
-          <div className='px-6 py-6 lg:px-8'>
-            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Xem thông tin</h3>
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        {/* Background overlay */}
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+          aria-hidden="true"
+          onClick={onClose}
+        ></div>
 
-            <form
-              className='mobile:space-y-6 grid grid-cols-1 gap-3 mobile:gap-0 mobile:grid-cols-1 space-y-0'
-              action='#'
-              autoComplete='false'
-              onSubmit={handleUpdateBank}
-            >
-              <div>
-                <label htmlFor='username' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Username
-                </label>
-                <input
-                  type='text'
-                  name='username'
-                  id='username'
-                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Username'
-                  disabled
-                  value={username}
-                  onChange={handleChange('username')}
-                />
-              </div>
-              <div>
-                <label htmlFor='username' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Ip
-                </label>
-                <input
-                  type='text'
-                  name='username'
-                  id='username'
-                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Thiết lập ip'
-                  value={ip}
-                  onChange={(e) => {
-                    setIp(e.target.value)
-                  }}
-                />
-              </div>
-              <div className='flex items-center'>
-                <input
-                  type='radio'
-                  id='true'
-                  name='toggle'
-                  className='mr-2'
-                  value={'true'}
-                  checked={checkIp === true ? true : false}
-                  onClick={() => setCheckIp(true)}
-                  onChange={handleChange('setIp')}
-                />
-                <label htmlFor='true' className='text-sm text-gray-900 dark:text-white'>
-                  True
-                </label>
-              </div>
-              <div className='flex items-center mt-2'>
-                <input
-                  type='radio'
-                  id='false'
-                  name='toggle'
-                  className='mr-2'
-                  value={'false'}
-                  checked={checkIp === false ? true : false}
-                  onClick={() => setCheckIp(false)}
-                />
-                <label htmlFor='falseControl' className='text-sm text-gray-900 dark:text-white'>
-                  False
-                </label>
-              </div>
-              <div>
-                <label htmlFor='name' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Tên
-                </label>
-                <input
-                  type='text'
-                  name='name'
-                  id='name'
-                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder=''
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor='phone' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Số điện thoại
-                </label>
-                <input
-                  type='text'
-                  name='phone'
-                  id='phone'
-                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder=''
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-
+        {/* Modal content */}
+        <div 
+          ref={modalRef}
+          className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
+          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div className="flex justify-between items-center mb-6">
+              <h2 id="modal-headline" className="text-2xl font-bold text-gray-800">Thông tin khách hàng</h2>
               <button
-                type='submit'
-                className=' text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                type="button"
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                onClick={onClose}
+                aria-label="Đóng"
               >
-                {mutationUpdateBank.isLoading ? (
-                  <div>
-                    <svg
-                      aria-hidden='true'
-                      role='status'
-                      className='inline w-4 h-4 mr-3 text-white animate-spin'
-                      viewBox='0 0 100 101'
-                      fill='none'
-                      xmlns='http://www.w3.org/2000/svg'
-                    >
-                      <path
-                        d='M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z'
-                        fill='#E5E7EB'
-                      />
-                      <path
-                        d='M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z'
-                        fill='currentColor'
-                      />
-                    </svg>
-                    Đang chờ...
-                  </div>
-                ) : (
-                  'Sửa'
-                )}
-              </button>
-              {showChangePass ? (
-                <div className='flex gap-x-2'>
-                  <input
-                    type='text'
-                    name='password'
-                    id='password'
-                    className={`bg-gray-50 ${
-                      showChangePass ? 'w-full' : 'w-0'
-                    }  transition-all duration-500 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white`}
-                    placeholder='Nhập mật khẩu vào đây để đổi'
-                    value={formState?.password !== '' ? formState?.password : data?.password}
-                    onChange={handleChange('password')}
-                  />
-                  <button
-                    type='button'
-                    onClick={handleUpdatePassword}
-                    className={` ${
-                      showChangePass ? 'w-[130px]' : 'w-full'
-                    } transition-all duration-500 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800`}
-                  >
-                    Xác nhận
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type='button'
-                  onClick={() => setShowChangePass(true)}
-                  className='w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800'
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  Đổi mật khẩu
-                </button>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Online Status Badge */}
+            <div className="mb-4">
+              <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${data.isOnline ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                {data.isOnline ? 'Đang trực tuyến' : 'Ngoại tuyến'}
+              </span>
+              {data.lastLoginTime && (
+                <span className="ml-2 text-sm text-gray-500">
+                  {data.isOnline 
+                    ? `Online từ: ${new Date(data.lastLoginTime).toLocaleString('vi-VN')}` 
+                    : `Đăng nhập cuối: ${new Date(data.lastLoginTime).toLocaleString('vi-VN')}`}
+                </span>
               )}
-            </form>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-4 text-gray-700">Thông tin cơ bản</h3>
+                <div className="space-y-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Username</span>
+                    <span className="font-medium">{data.username}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Họ tên</span>
+                    <span className="font-medium">{data.name || 'Chưa cập nhật'}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Mã giới thiệu</span>
+                    <span className="font-medium">{data.idRef || 'Không có'}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Level</span>
+                    <span className="font-medium">VIP {data.level}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Trạng thái tài khoản</span>
+                    <span className={`font-medium ${data.isLook ? 'text-green-600' : 'text-red-600'}`}>
+                      {data.isLook ? 'Đã mở' : 'Đã khóa'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-4 text-gray-700">Thông tin tài chính</h3>
+                <div className="space-y-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Số dư</span>
+                    <span className="font-medium text-green-600">{formatCurrency(data.totalAmount)}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Số tiền đóng băng</span>
+                    <span className="font-medium text-orange-500">{formatCurrency(data.totalFreeze)}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">Hoa hồng</span>
+                    <span className="font-medium text-blue-600">{formatCurrency(data.moneyComissions)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-700">Thông tin ngân hàng</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col">
+                  <span className="text-sm text-gray-500">Tên ngân hàng</span>
+                  <span className="font-medium">{data.bankName || 'Chưa cập nhật'}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm text-gray-500">Số tài khoản</span>
+                  <span className="font-medium">{data.banKNumber || 'Chưa cập nhật'}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm text-gray-500">Chủ tài khoản</span>
+                  <span className="font-medium">{data.nameUserBank || 'Chưa cập nhật'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              onClick={onClose}
+            >
+              Đóng
+            </button>
           </div>
         </div>
       </div>

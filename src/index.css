@@ -2,6 +2,121 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom CSS for Navbar */
+.navbar-transition {
+  transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+}
+
+/* Smooth transitions for content area */
+.content-transition {
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Icon responsive sizing */
+.nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-icon-collapsed {
+  width: 1.875rem;
+  height: 1.875rem;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Navbar collapsed state improvements */
+.navbar-collapsed .nav-menu-item {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  justify-content: center;
+}
+
+/* Improved scrollbar for sidebar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile overlay animation */
+@media (min-width: 350px) and (max-width: 600px) {
+  .mobile-overlay {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Online/Offline Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.25;
+  transition: all 0.2s ease-in-out;
+}
+
+.online-badge {
+  background-color: #10b981; /* green-500 */
+  color: white;
+  box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+  animation: pulse-green 2s infinite;
+}
+
+.offline-badge {
+  background-color: #9ca3af; /* gray-400 */
+  color: #1f2937; /* gray-800 */
+}
+
+/* Pulsing animation for online badge */
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Hover effects */
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+.online-badge:hover {
+  background-color: #059669; /* green-600 */
+}
+
+.offline-badge:hover {
+  background-color: #6b7280; /* gray-500 */
+}
+
 html {
   height: 100%;
   line-height: 1.2;

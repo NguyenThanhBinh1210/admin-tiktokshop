@@ -1,103 +1,676 @@
-Chức năng: Quản lý tài khoản Facebook khách hàng cho nhân viên
+==================================================
+HƯỚNG DẪN SỬ DỤNG CHỨC NĂNG TRACKING ONLINE/OFFLINE CHO ADMIN
+==================================================
 
-Mục tiêu:
-- Cho phép nhân viên lưu trữ tài khoản Facebook của khách hàng vào hệ thống, gắn với id khách hàng và id nhân viên.
-- Đảm bảo không lưu trùng tài khoản Facebook.
-- Cho phép admin xem toàn bộ danh sách, có phân trang và tìm kiếm theo từng trường riêng biệt.
-- Hỗ trợ kiểm tra nhanh tài khoản Facebook đã tồn tại chưa.
+I. TỔNG QUAN
+==================================================
 
----
+Chức năng tracking online/offline cho phép admin:
+1. Theo dõi trạng thái online/offline của người dùng trong thời gian thực
+2. Xem danh sách người dùng với ưu tiên hiển thị người dùng online trước
+3. Xem thống kê chi tiết về hoạt động online của người dùng
+4. Force logout người dùng từ xa
 
-1. Kiểm tra tài khoản Facebook đã tồn tại chưa
-- Endpoint: GET /admin/employee/facebook-customer/check?facebookAccount=<facebook_account>
-- Tham số query: facebookAccount (có thể là link, username, ...). Backend sẽ tự động chuẩn hóa lấy username cuối cùng.
-- Response:
-{
-  "status": "success",
-  "data": {
-    "existed": true,      // true nếu đã tồn tại, false nếu chưa
-    "info": { ... }       // Thông tin bản ghi nếu có, null nếu chưa
+II. TRUY CẬP DASHBOARD ONLINE USERS
+==================================================
+
+1. Đăng nhập vào hệ thống với tài khoản admin
+2. Truy cập trang quản lý người dùng
+3. Danh sách người dùng sẽ tự động hiển thị với người dùng online ở trên cùng
+4. Các chỉ số tổng quan về số lượng người dùng online/offline sẽ hiển thị ở đầu trang
+
+III. CÁC TÍNH NĂNG CHÍNH
+==================================================
+
+1. Xem danh sách người dùng online/offline
+-----------------------------------------
+
+Danh sách người dùng đã được sắp xếp tự động với người dùng online hiển thị ở trên cùng. Mỗi người dùng sẽ có:
+- Badge trạng thái "Trực tuyến" hoặc "Ngoại tuyến"
+- Thời gian đăng nhập gần nhất
+- Thời gian hoạt động gần nhất
+- Thời gian session hiện tại (đối với người dùng đang online)
+
+2. Xem thống kê người dùng online
+-----------------------------------------
+
+Tại trang dashboard admin, bạn có thể xem các thống kê:
+- Tổng số người dùng online
+- Phân loại theo vai trò (Admin, Staff, User)
+- Thời gian session trung bình
+- Phân bố theo thời gian online (5 phút, 30 phút, 1 giờ, >1 giờ)
+
+3. Kiểm tra trạng thái online của một người dùng cụ thể
+-----------------------------------------
+
+- Tìm kiếm người dùng theo tên hoặc ID
+- Xem trạng thái online/offline và thông tin chi tiết
+- Xem lịch sử đăng nhập/đăng xuất gần đây
+
+4. Force logout người dùng
+-----------------------------------------
+
+Admin có quyền force logout người dùng từ xa:
+- Tìm người dùng cần force logout trong danh sách
+- Nhấn vào nút "Force Logout" bên cạnh người dùng đó
+- Xác nhận hành động
+- Người dùng sẽ bị đăng xuất và nhận thông báo
+
+IV. HƯỚNG DẪN SỬ DỤNG API
+==================================================
+
+1. Lấy dashboard online users:
+
+```javascript
+async function getOnlineUsersDashboard() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await axios.get(`/api/v1/admin/online-tracking/dashboard`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    // Response format:
+    // {
+    //   status: "success",
+    //   data: {
+    //     summary: {
+    //       totalUsers: 100,
+    //       onlineCount: 15,
+    //       offlineCount: 85,
+    //       onlineAdmins: 2,
+    //       onlineStaff: 3,
+    //       onlineRegularUsers: 10
+    //     },
+    //     onlineUsers: [...],
+    //     offlineUsers: [...],
+    //     lastUpdate: "2024-01-10T10:00:00Z"
+    //   }
+    // }
+    
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching online users dashboard:', error);
+    throw error;
   }
 }
+```
 
-2. Lưu tài khoản Facebook khách hàng
-- Endpoint: POST /admin/employee/facebook-customer
-- Headers: Authorization: Bearer <token> (token của nhân viên, dùng để xác định staffId)
-- Body (JSON):
-{
-  "facebookAccount": "facebook.com/duyenocho",   // Có thể là link, username, ... (backend sẽ tự chuẩn hóa)
-  "userId": "id_khach_hang"                      // _id của khách hàng (lấy từ bảng user)
-}
-- Không cần truyền staffId – backend sẽ tự lấy từ token đăng nhập.
-- Nếu tài khoản Facebook đã tồn tại, trả về lỗi.
-- Response thành công:
-{
-  "status": "success",
-  "data": {
-    "_id": "...",
-    "facebookAccount": "duyenocho",
-    "staffId": "id_nhan_vien",
-    "userId": "id_khach_hang",
-    "createdAt": "...",
-    "updatedAt": "...",
-    "facebookUrl": "https://www.facebook.com/duyenocho"
+2. Lấy thống kê online users:
+
+```javascript
+async function getOnlineUsersStatistics() {
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await axios.get(`/api/v1/admin/online-tracking/statistics`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    // Response format:
+    // {
+    //   status: "success",
+    //   data: {
+    //     current: {
+    //       total: 15,
+    //       byRole: {
+    //         admin: 2,
+    //         staff: 3,
+    //         user: 10
+    //       },
+    //       averageSessionDuration: 45
+    //     },
+    //     sessions: {
+    //       last5Minutes: 3,
+    //       last30Minutes: 5,
+    //       last1Hour: 4,
+    //       moreThan1Hour: 3
+    //     }
+    //   }
+    // }
+    
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching online users statistics:', error);
+    throw error;
   }
 }
+```
 
-3. Lấy toàn bộ danh sách tài khoản Facebook khách hàng (chỉ cho admin, có phân trang & search)
-- Endpoint: GET /admin/employee/facebook-customer/all
-- Headers: Authorization: Bearer <token> (token của admin)
-- Query params:
-  - page: Số trang (bắt đầu từ 1, mặc định 1)
-  - limit: Số bản ghi/trang (mặc định 10)
-  - facebookAccount: (tùy chọn) Tìm theo username Facebook (partial, không phân biệt hoa thường)
-  - staffUsername: (tùy chọn) Tìm theo username của nhân viên (partial, không phân biệt hoa thường)
-  - userUsername: (tùy chọn) Tìm theo username của khách hàng (partial, không phân biệt hoa thường)
-- Có thể truyền 1, 2 hoặc cả 3 query, backend sẽ kết hợp điều kiện AND.
-- Response:
-{
-  "status": "success",
-  "data": [
-    {
-      "_id": "...",
-      "facebookAccount": "duyenocho",
-      "staffId": { "_id": "...", "name": "Tên nhân viên", "username": "..." },
-      "userId": { "_id": "...", "name": "Tên khách", "username": "..." },
-      "createdAt": "...",
-      "updatedAt": "...",
-      "facebookUrl": "https://www.facebook.com/duyenocho"
-    },
-    ...
-  ],
-  "page": 1,
-  "limit": 10,
-  "total": 123,
-  "totalPages": 13
+3. Force logout user:
+
+```javascript
+async function forceLogoutUser(userId) {
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await axios.post(`/api/v1/users/${userId}/force-offline`, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    // Response format:
+    // {
+    //   status: "success",
+    //   message: "User username123 has been forced offline",
+    //   data: {
+    //     user: {
+    //       id: "123",
+    //       username: "username123",
+    //       name: "User Name"
+    //     }
+    //   }
+    // }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error forcing user logout:', error);
+    throw error;
+  }
+}
+```
+
+4. Lấy danh sách người dùng (đã sắp xếp online lên trên):
+
+```javascript
+async function getUsers(page = 1, limit = 10, search = '') {
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await axios.get(`/api/v1/users/get-all-user`, {
+      params: { page, limit, search },
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    // response.data.users đã được sắp xếp với online users lên trên
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+}
+```
+
+V. TÍCH HỢP SOCKET.IO ĐỂ CẬP NHẬT REAL-TIME
+==================================================
+
+1. Thiết lập kết nối socket:
+
+```javascript
+import { io } from 'socket.io-client';
+
+// Khởi tạo kết nối socket
+const socket = io('http://your-server-url:4002', {
+  withCredentials: true,
+  transports: ['websocket', 'polling'],
+  autoConnect: true
+});
+
+// Xử lý sự kiện kết nối
+socket.on('connect', () => {
+  console.log('Admin socket connected with id:', socket.id);
+  
+  // Đăng ký admin online sau khi đăng nhập thành công
+  if (localStorage.getItem('userId')) {
+    socket.emit('user-login', { 
+      id: localStorage.getItem('userId') 
+    });
+  }
+});
+```
+
+2. Lắng nghe các sự kiện online/offline:
+
+```javascript
+// Lắng nghe khi có user online
+socket.on('user-came-online', (data) => {
+  console.log('User came online:', data.user);
+  console.log('Total online users:', data.onlineCount);
+  
+  // Cập nhật UI hoặc store
+  updateUserOnlineStatus(data.user.id, true);
+  updateOnlineCount(data.onlineCount);
+  
+  // Hiển thị thông báo
+  showNotification(`${data.user.name} vừa online`);
+});
+
+// Lắng nghe khi có user offline
+socket.on('user-went-offline', (data) => {
+  console.log('User went offline:', data.user);
+  console.log('Total online users:', data.onlineCount);
+  
+  // Cập nhật UI hoặc store
+  updateUserOnlineStatus(data.user.id, false);
+  updateOnlineCount(data.onlineCount);
+  
+  // Hiển thị thông báo nếu là admin force logout
+  if (data.forcedByAdmin) {
+    showNotification(`${data.user.name} đã bị force logout bởi admin`);
+  }
+});
+```
+
+3. Force logout user qua socket:
+
+```javascript
+function forceLogoutUserViaSocket(userId) {
+  socket.emit('admin-force-offline', { userId });
+  
+  // Lắng nghe kết quả
+  socket.on('admin-force-offline-success', (data) => {
+    showNotification(data.message);
+  });
+  
+  socket.on('error', (error) => {
+    showNotification(error.message, 'error');
+  });
+}
+```
+
+VI. HIỂN THỊ TRẠNG THÁI ONLINE/OFFLINE TRONG UI
+==================================================
+
+1. Hiển thị badge trạng thái:
+
+```jsx
+function UserStatusBadge({ isOnline }) {
+  return (
+    <span className={`status-badge ${isOnline ? 'online' : 'offline'}`}>
+      {isOnline ? 'Trực tuyến' : 'Ngoại tuyến'}
+    </span>
+  );
+}
+```
+
+2. Hiển thị danh sách người dùng với trạng thái và nút force logout:
+
+```jsx
+function AdminUsersList({ users }) {
+  const handleForceLogout = (userId) => {
+    if (window.confirm('Bạn có chắc chắn muốn force logout người dùng này?')) {
+      forceLogoutUser(userId)
+        .then(response => {
+          showNotification(response.message);
+        })
+        .catch(error => {
+          showNotification(error.message, 'error');
+        });
+    }
+  };
+
+  return (
+    <div className="users-list">
+      {users.map(user => (
+        <div key={user._id} className="user-item">
+          <div className="user-info">
+            <h3>{user.name}</h3>
+            <p>{user.username}</p>
+            <UserStatusBadge isOnline={user.isOnline} />
+            {user.isOnline && (
+              <p>Online từ: {formatDateTime(user.lastLoginTime)}</p>
+            )}
+          </div>
+          {user.isOnline && (
+            <button 
+              className="force-logout-btn"
+              onClick={() => handleForceLogout(user._id)}
+            >
+              Force Logout
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+3. Hiển thị thống kê online users:
+
+```jsx
+function OnlineStatistics({ statistics }) {
+  return (
+    <div className="online-statistics">
+      <div className="stat-card">
+        <h3>Tổng số online</h3>
+        <div className="stat-value">{statistics.current.total}</div>
+      </div>
+      
+      <div className="stat-card">
+        <h3>Theo vai trò</h3>
+        <div className="stat-detail">
+          <div>Admin: {statistics.current.byRole.admin}</div>
+          <div>Staff: {statistics.current.byRole.staff}</div>
+          <div>User: {statistics.current.byRole.user}</div>
+        </div>
+      </div>
+      
+      <div className="stat-card">
+        <h3>Thời gian trung bình</h3>
+        <div className="stat-value">
+          {statistics.current.averageSessionDuration} phút
+        </div>
+      </div>
+      
+      <div className="stat-card">
+        <h3>Phân bố thời gian</h3>
+        <div className="stat-detail">
+          <div>&lt;5 phút: {statistics.sessions.last5Minutes}</div>
+          <div>5-30 phút: {statistics.sessions.last30Minutes}</div>
+          <div>30-60 phút: {statistics.sessions.last1Hour}</div>
+          <div>&gt;60 phút: {statistics.sessions.moreThan1Hour}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+VII. DASHBOARD ADMIN HOÀN CHỈNH
+==================================================
+
+Dưới đây là ví dụ về một dashboard admin hoàn chỉnh:
+
+```jsx
+function AdminDashboard() {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [statistics, setStatistics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    // Lấy dữ liệu dashboard
+    Promise.all([
+      getOnlineUsersDashboard(),
+      getOnlineUsersStatistics()
+    ])
+      .then(([dashboardData, statistics]) => {
+        setDashboardData(dashboardData);
+        setStatistics(statistics);
+        setLoading(false);
+      })
+      .catch(error => {
+        setError(error.message);
+        setLoading(false);
+      });
+      
+    // Thiết lập socket listeners
+    socket.on('user-came-online', handleUserCameOnline);
+    socket.on('user-went-offline', handleUserWentOffline);
+    
+    return () => {
+      socket.off('user-came-online', handleUserCameOnline);
+      socket.off('user-went-offline', handleUserWentOffline);
+    };
+  }, []);
+  
+  const handleUserCameOnline = (data) => {
+    // Cập nhật dữ liệu khi có user online
+    setDashboardData(prevData => {
+      if (!prevData) return prevData;
+      
+      // Tìm user trong danh sách offline
+      const userIndex = prevData.offlineUsers.findIndex(u => u.id === data.user.id);
+      
+      if (userIndex >= 0) {
+        // Di chuyển user từ offline sang online
+        const user = prevData.offlineUsers[userIndex];
+        user.isOnline = true;
+        user.lastLoginTime = data.user.loginTime;
+        
+        const newOfflineUsers = [...prevData.offlineUsers];
+        newOfflineUsers.splice(userIndex, 1);
+        
+        return {
+          ...prevData,
+          summary: {
+            ...prevData.summary,
+            onlineCount: prevData.summary.onlineCount + 1,
+            offlineCount: prevData.summary.offlineCount - 1
+          },
+          onlineUsers: [user, ...prevData.onlineUsers],
+          offlineUsers: newOfflineUsers
+        };
+      }
+      
+      return prevData;
+    });
+    
+    // Cập nhật thống kê
+    setStatistics(prevStats => {
+      if (!prevStats) return prevStats;
+      
+      return {
+        ...prevStats,
+        current: {
+          ...prevStats.current,
+          total: prevStats.current.total + 1,
+          byRole: {
+            ...prevStats.current.byRole,
+            [data.user.role]: prevStats.current.byRole[data.user.role] + 1
+          }
+        },
+        sessions: {
+          ...prevStats.sessions,
+          last5Minutes: prevStats.sessions.last5Minutes + 1
+        }
+      };
+    });
+  };
+  
+  const handleUserWentOffline = (data) => {
+    // Tương tự như handleUserCameOnline nhưng ngược lại
+    // ...
+  };
+  
+  if (loading) return <div>Loading dashboard...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <div className="admin-dashboard">
+      <h1>Dashboard Admin</h1>
+      
+      <div className="summary-cards">
+        <div className="summary-card">
+          <h2>Tổng số người dùng</h2>
+          <div className="summary-value">{dashboardData.summary.totalUsers}</div>
+        </div>
+        <div className="summary-card online">
+          <h2>Đang online</h2>
+          <div className="summary-value">{dashboardData.summary.onlineCount}</div>
+        </div>
+        <div className="summary-card offline">
+          <h2>Đang offline</h2>
+          <div className="summary-value">{dashboardData.summary.offlineCount}</div>
+        </div>
+      </div>
+      
+      {statistics && <OnlineStatistics statistics={statistics} />}
+      
+      <div className="users-section">
+        <h2>Người dùng đang online ({dashboardData.onlineUsers.length})</h2>
+        <AdminUsersList users={dashboardData.onlineUsers} />
+        
+        <h2>Người dùng offline ({dashboardData.offlineUsers.length})</h2>
+        <AdminUsersList users={dashboardData.offlineUsers} />
+      </div>
+    </div>
+  );
+}
+```
+
+VIII. THỰC HIỆN FORCE LOGOUT
+==================================================
+
+Có hai cách để admin force logout một người dùng:
+
+1. Sử dụng REST API:
+
+```javascript
+async function handleForceLogout(userId) {
+  try {
+    const response = await forceLogoutUser(userId);
+    showNotification(response.message);
+    
+    // Cập nhật UI
+    updateUserStatus(userId, false);
+  } catch (error) {
+    showNotification(`Lỗi: ${error.message}`, 'error');
+  }
+}
+```
+
+2. Sử dụng Socket.IO (real-time hơn):
+
+```javascript
+function handleForceLogout(userId) {
+  socket.emit('admin-force-offline', { userId });
 }
 
----
+// Lắng nghe kết quả
+socket.on('admin-force-offline-success', (data) => {
+  showNotification(data.message);
+});
 
-Quy trình chuẩn cho FE:
-1. Nhân viên nhập tài khoản Facebook khách hàng.
-2. FE gọi API check để kiểm tra trùng.
-   - Nếu đã tồn tại: Thông báo cho nhân viên, không cho lưu.
-   - Nếu chưa tồn tại: Hiển thị nút/lựa chọn để lưu.
-3. FE gọi API POST để lưu, chỉ truyền facebookAccount và userId.
-   - userId là _id của khách hàng (lấy từ danh sách user).
-   - Không cần truyền staffId, backend tự lấy từ token.
-4. Admin có thể xem toàn bộ danh sách, phân trang, mỗi bản ghi có cả thông tin nhân viên và khách hàng, có thể tìm kiếm theo từng trường riêng biệt.
+socket.on('error', (error) => {
+  showNotification(`Lỗi: ${error.message}`, 'error');
+});
+```
 
----
+IX. LƯU Ý QUAN TRỌNG
+==================================================
 
-Lưu ý kỹ thuật:
-- FE cần truyền token hợp lệ (JWT) trong header cho mọi request.
-- userId phải là _id của khách hàng đã có trong hệ thống.
-- staffId backend tự lấy từ token, không cần truyền.
-- Phân trang: FE truyền page, limit khi lấy danh sách cho admin.
-- Không lưu trùng facebookAccount.
-- Khi hiển thị, dùng trường facebookUrl để show link Facebook đầy đủ.
-- Tìm kiếm:
-  - Theo username Facebook: facebookAccount
-  - Theo username nhân viên: staffUsername
-  - Theo username khách hàng: userUsername
-  - Có thể kết hợp nhiều trường, backend sẽ lọc theo tất cả điều kiện. 
+1. **Quyền hạn**: Chỉ tài khoản admin mới có quyền truy cập các API và chức năng đặc biệt này.
+
+2. **Cập nhật real-time**: Để đảm bảo dữ liệu luôn cập nhật, hãy sử dụng Socket.IO để lắng nghe các sự kiện online/offline.
+
+3. **Pagination**: Khi hiển thị danh sách người dùng, hãy sử dụng pagination để tránh tải quá nhiều dữ liệu cùng lúc.
+
+4. **Force logout**: Hãy cẩn thận khi sử dụng chức năng force logout, vì nó sẽ đăng xuất người dùng ngay lập tức.
+
+5. **Thời gian refresh**: Nếu không sử dụng Socket.IO, bạn nên refresh dữ liệu định kỳ (ví dụ: mỗi 30 giây) để đảm bảo thông tin luôn mới nhất.
+
+X. CSS THAM KHẢO
+==================================================
+
+```css
+/* Dashboard styles */
+.admin-dashboard {
+  padding: 20px;
+}
+
+.summary-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-card {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 20px;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-card.online {
+  background-color: #e8f5e9;
+}
+
+.summary-card.offline {
+  background-color: #f5f5f5;
+}
+
+.summary-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.online-statistics {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  flex: 1;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.stat-detail {
+  margin-top: 10px;
+}
+
+.users-section {
+  margin-top: 30px;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.status-badge.online {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.status-badge.offline {
+  background-color: #9E9E9E;
+  color: white;
+}
+
+.force-logout-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.force-logout-btn:hover {
+  background-color: #d32f2f;
+}
+```

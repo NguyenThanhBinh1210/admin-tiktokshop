@@ -13,7 +13,7 @@ const FacebookCustomerPage = () => {
   const { profile } = useContext(AppContext);
   const isAdmin = profile?.role === 'admin' || profile?.isAdmin;
   const [facebookAccount, setFacebookAccount] = useState('');
-  const [userId, setUserId] = useState('');
+  const [username, setUserId] = useState('');
   const [checkResult, setCheckResult] = useState<any>(null);
   const [search, setSearch] = useState({ facebookAccount: '', staffUsername: '', userUsername: '' });
   const [page, setPage] = useState(1);
@@ -47,7 +47,7 @@ const FacebookCustomerPage = () => {
   });
 
   // Staff: add facebook customer
-  const addMutation = useMutation((body: { facebookAccount: string; userId: string }) => addFacebookCustomer(body), {
+  const addMutation = useMutation((body: { facebookAccount: string; username: string }) => addFacebookCustomer(body), {
     onSuccess: () => {
       toast.success('Lưu thành công!');
       setFacebookAccount('');
@@ -127,8 +127,8 @@ const FacebookCustomerPage = () => {
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Nhập ID khách hàng"
-                value={userId}
+                placeholder="Nhập username khách hàng"
+                value={username}
                 onChange={e => setUserId(e.target.value)}
               />
             </div>
@@ -146,8 +146,8 @@ const FacebookCustomerPage = () => {
             
             <button
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              onClick={() => addMutation.mutate({ facebookAccount, userId })}
-              disabled={!facebookAccount.trim() || !userId.trim() || !checkResult || checkResult.existed || addMutation.isLoading}
+              onClick={() => addMutation.mutate({ facebookAccount, username })}
+              disabled={!facebookAccount.trim() || !username.trim() || !checkResult || checkResult.existed || addMutation.isLoading}
             >
               {addMutation.isLoading ? 'Đang lưu...' : 'Lưu'}
             </button>
@@ -158,9 +158,9 @@ const FacebookCustomerPage = () => {
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-xs">
               <div><strong>Debug Info:</strong></div>
               <div>Facebook Account: {facebookAccount || 'Empty'}</div>
-              <div>User ID: {userId || 'Empty'}</div>
+              <div>User ID: {username || 'Empty'}</div>
               <div>Check Result: {checkResult ? (checkResult.existed ? 'Existed' : 'Available') : 'Not checked'}</div>
-              <div>Can Save: {(!facebookAccount.trim() || !userId.trim() || !checkResult || checkResult.existed) ? 'No' : 'Yes'}</div>
+              <div>Can Save: {(!facebookAccount.trim() || !username.trim() || !checkResult || checkResult.existed) ? 'No' : 'Yes'}</div>
             </div>
           )}
 
@@ -214,7 +214,7 @@ const FacebookCustomerPage = () => {
                         {item.facebookAccount}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.userId?.name || 'N/A'} ({item.userId?.username || 'dev005'})
+                        {item.username?.name || 'N/A'} ({item.username?.username || 'dev005'})
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {item.createdAt ? formatDate(item.createdAt) : 'N/A'}
@@ -226,7 +226,7 @@ const FacebookCustomerPage = () => {
                           rel="noopener noreferrer" 
                           className="hover:text-blue-800 underline"
                         >
-                          Xem Facebook
+                          {item.facebookUrl || `https://www.facebook.com/${item.facebookAccount}`}
                         </a>
                       </td>
                     </tr>
@@ -345,7 +345,7 @@ const FacebookCustomerPage = () => {
                         {item.staffId?.name || 'N/A'} ({item.staffId?.username || 'N/A'})
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.userId?.name || 'N/A'} ({item.userId?.username || 'N/A'})
+                        {item.username?.name || 'N/A'} ({item.username?.username || 'N/A'})
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {item.createdAt ? formatDate(item.createdAt) : 'N/A'}

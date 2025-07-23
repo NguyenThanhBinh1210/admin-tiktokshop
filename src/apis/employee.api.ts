@@ -10,7 +10,7 @@ export const checkFacebookCustomer = (facebookAccount: string) =>
   serverGet.get(`/v1/employee/facebook-customer/check`, { params: { facebookAccount } });
 
 // 2. Add facebook customer (staff only)
-export const addFacebookCustomer = (body: { facebookAccount: string; userId: string }) =>
+export const addFacebookCustomer = (body: { facebookAccount: string; username: string }) =>
   http.post(`/v1/employee/facebook-customer`, body);
 
 // 3. Get all facebook customers (admin only, with search & pagination)

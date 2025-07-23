@@ -70,14 +70,14 @@ const ShowMessage = ({ isOpen, onClose, data: data1, name: name1 }: any) => {
         message: valueInput,
         sender: dataMess?.data.getMessage?.sender,
         receiver: name1,
-        userId: profile._id,
+        userId: profile?._id,
         store: true,
       };
       setValueInput('');
 
       const newMessage = {
         _id: generateRandomOrderCode(10),
-        userId: profile._id,
+        userId: profile?._id,
         message: valueInput,
       };
       setContentMessage((prevMessages: any) => [...prevMessages, newMessage]);
@@ -159,7 +159,7 @@ const ShowMessage = ({ isOpen, onClose, data: data1, name: name1 }: any) => {
     if (image?.startsWith('https://')) {
       return image;
     }
-    return `https://admin.ordersdropship.com/${image}`;
+    return `https://chat.ordersdropship.com/${image}`;
   }
 
   return (

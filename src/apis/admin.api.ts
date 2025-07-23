@@ -31,3 +31,8 @@ export const updateUser = (id: string, body: any) => render.patch(`/v1/user/${id
 export const updateTruoc = (id: string, body: any) => upload.patch(`/v1/user/update-frontimage/${id}`, body)
 export const updateSau = (id: string, body: any) => upload.patch(`/v1/user/update-backimage/${id}`, body)
 export const updateChanDung = (id: string, body: any) => upload.patch(`/v1/user/update-portrait/${id}`, body)
+
+// Online tracking APIs
+export const getOnlineUsersDashboard = () => serverGet.get('/api/v1/admin/online-tracking/dashboard')
+export const getOnlineUsersStatistics = () => serverGet.get('/api/v1/admin/online-tracking/statistics')
+export const forceLogoutUser = (userId: string) => http.post(`/api/v1/users/${userId}/force-offline`, {})
